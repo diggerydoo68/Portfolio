@@ -5,3 +5,9 @@ def shut_down(s):
         return 'Shutdown aborted'
     else:
         return 'Sorry'
+
+
+
+from math import sqrt
+s=sqrt(13689)
+print s 
