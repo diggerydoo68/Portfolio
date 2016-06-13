@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
 #--This is also written just as an exmaple of how to do some basic math things inside of perl.
-#--This one isn't quite so simple however...gets fancy....
 #--------------------------------------------------------------------------------------------
 
 
@@ -27,11 +26,11 @@ sub push_prime_numbers_into_array{
     foreach ($i = 12; $i <= $user_number; $i++){   #--we are starting at 12 because 11 is in our prime list already
     
        $not_prime = 0;
-       FOREACH: foreach $prime (@array_of_primes){    #--Randy, this FOREACH: value is called a label.  It 
+       FOREACH: foreach $prime (@array_of_primes){    #--This FOREACH: value is called a label.  It 
                                                       #--allows you to sometimes break out of loops and things.
                                                       #--You can use any word...just put the colon after...
 
-          #--We don't want to use 1.  Everything is divisible by 1.  So skip it...
+          #--We don't want to use 1.  Everything is divisible by 1.  
           #--There are more elegant ways to do this than "next", but I am doing it in this program to show you the concept.
           #--
           #--Generally you try to avoid these things,...because it is a lot like a "GOTO" statement.  In this case, however,
