@@ -1,0 +1,12 @@
+#---You need about 3 lines of code to pull "hello world" from the database...
+#---The following will work...
+
+$command = "select 'hello world' from dual;";
+$results_from_database = execute_sql($xdbaprod_user, $SLC, 'xdba','xdba',$command);
+print $results_from_database;
+
+#--that is all that is required.  
+
+
+
+
