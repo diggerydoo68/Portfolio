@@ -1,3 +1,5 @@
+# Battleship game learned from code academy and used for better understanding Python
+
 from random import randint
 
 board = []
