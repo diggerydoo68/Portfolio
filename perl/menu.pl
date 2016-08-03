@@ -20,13 +20,16 @@ format TOP =
 .
 
 select(STDOUT);
+$~ = PASTAS;
 $~ = FOOD;
 $^ = TOP;
 
-$Gnocchi = ("Gnocchi");
-$Al_dente = ("Al dente");
-$Meatball = ("Meatball");
-$Three_cheese = ("Three Cheese");
+# $Gnocchi = ("Gnocchi");
+# $Al_dente = ("Al dente");
+# $Meatball = ("Meatball");
+# $Three_cheese = ("Three Cheese");
+
+@p = ("Gnocchi", "Al_dente", "Meatball", "Three Cheese");
 
 $pastas = ("Pasta");
 $pizza = ("Pizza");
@@ -37,24 +40,41 @@ $dessert = ("Desserts");
 print "Would you like to see the menu?(Yes/No)\n";
 chomp($user_response = <>);
 
+$error_trap = 0;
 
-while (substr($user_response, 0, 1) =~ /Y|y|N|n/){
-        if ($user_reponse) != /Yes/ || /No/{
-                print "GoodBye!\n";
-            }
-        
-        write;
-        print "What would you like to eat?\n";
-        chomp($user_response = <>);
-        if (substr($user_response, 0, 1) =~ /pasta/){
-                write;
-                print "What type of Pasta?\n";
-                chomp($user_response = <>)
-            }else{
-                    print "We dont serve that here! Please make another order.\n";
-                    chomp($user_response = <>);
-                }
-        }
+while($error_trap == 0){
+	if ($user_response =~ /Ye/){
+		$error_trap = 1;
+		write;
+		print "What would you like to order?\n";
+		chomp($user_response = <>);
+	}
+	else{
+		print "No manners, no service!\n";
+		chomp($user_response = <>); 
+	}
+}
+
+while($error_trap == 1){
+	if ($user_response =~ /Pasta/){
+		$i = 0;
+		$error_trap = 2;
+		foreach (@p){
+			$Gnocchi = $p[$i++];
+			$Al_dente = $p[$i++];
+			$Meatball = $p[$i++];
+			$Three_cheese = $p[$i++];
+			write PASTAS;
+		}
+		print "What Type of Pasta would you like to order?\n";
+		chomp($user_response = <>);		
+	}
+	else{
+		print "No manners, no service!\n";
+		chomp($user_response = <>); 
+	}
+}
+
 
     
 

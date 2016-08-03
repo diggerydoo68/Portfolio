@@ -1,0 +1,154 @@
+#!/usr/bin/perl
+
+sub CHECK_<name_your_test(lowercase)> {
+
+   #-- This is a wrapper template.  If you follow this template, you will be
+   #-- able to deploy tests to any area in this system.
+   #--/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+   #--
+   #-- 1. FORMAT CREATE STEP:
+   #--
+   #-- Make sure to update the format_output.pm file.
+   #-- A total of 4 formats are needed:
+   #--
+   #--    i.    <name_of_your_test>_CHECK
+   #--    ii.   <name_of_your_test>_CHECK_REPORT
+   #--    iii.  <name_of_your_test>_CHECK_ENV_HEADER
+   #--    iv..  <name_of_your_test>_CHECK_REPORT_HEADER
+   #--
+   #--  Look at the file for examples. Everything should line up.
+   #--  You get a total of 9 variables to work with.
+   #--
+   #---------------------------------------------------------------
+   #--
+   #- -2. CREATE VIEW STEP:
+   #--
+   #-- Make sure to create a view in the inventory database that
+   #-- has the data you need to pull from.  This view is what takes
+   #-- into account the "toggles" or <on/off> values.
+   #--
+   #---------------------------------------------------------------
+   #--
+   #-- 3. SQL STEP:
+   #--
+   #-- Make sure you update the build_env_sql_code.pm file to pull
+   #-- the stuff from the inventory with the SQL you want.  This is
+   #-- where the code comes from to build environment files.
+   #--
+   #---------------------------------------------------------------
+   #--
+   #-- 4. BUILD ENV FILE STEP:
+   #--
+   #-- Make sure to update the build_env_file.pm with the
+   #-- commands you need to create the environment file from the
+   #-- code you just inserted above.
+   #-- This file controls where the scripts are run...
+   #--    ten-min
+   #--    hourly
+   #--    daily
+   #--    weekly
+   #--
+   #---------------------------------------------------------------
+   #--
+   #-- 5. BUILD TESTING STEP:
+   #--
+   #-- Make sure to follow this template here as this code is what
+   #-- performs the actual test and output results.  Just copy this
+   #-- to the name you need, and follow the format examples in this
+   #-- directory.  The file name you use, for example, needs to have
+   #-- the same format as the others.
+   #--
+   #---------------------------------------------------------------
+
+#-----FILL THIS IN
+#-----------------
+#-----------------
+   my $name_of_your_test          = "<name_your_test(Upper_case)>";
+
+
+#--------
+   my $filter = "$name_of_your_test\_CHECK";
+   my $header = "$name_of_your_test\_CHECK_REPORT_HEADER";
+   my $report = "$name_of_your_test\_CHECK_REPORT";
+
+   my $alert_header_written_flag = 'FALSE';
+   my $log_header_written_flag   = 'FALSE';
+
+
+#--Loop through the environment file
+   foreach $line (@env_file){
+
+      next unless (substr($line, 0, index($line, ' ', 1)) eq $filter);
+      chomp($line);
+
+      #--Take care of the header on the logfile
+      if ($log_header_written_flag eq 'FALSE'){
+         write_header($header, $log_file_handle);
+         close $header;
+         $log_header_written_flag = 'TRUE';
+      }
+
+
+  #--FILL THIS IN----------------------------------------------------------
+  #--These values will be used below....so keep them in mind.
+  #--These are the values being pulled from your environment file into this
+  #--so your program knows what to work on.
+  #------------------------------------------------------------------------
+      ($test_being_performed, $<your_value>,...$<your_value>) = split /\|/, $line;
+
+
+  #--FILL THIS IN--------------------------------------------------------
+  #--trim whitespace off of things
+  #--Sorry you have to do this.  Copy these from what you just did above.
+  #----------------------------------------------------------------------
+      $test_being_performed =~ s/^\s+|\s+$//g;
+      $<your_value>         =~ s/^\s+|\s+$//g;
+          .
+          .
+          .
+      $<your_value>         =~ s/^\s+|\s+$//g;
+
+
+  #--Your test code happens here..............................
+  #-----------------------------------------------------------
+  #-----------------------------------------------------------
+  #-----------------------------------------------------------
+  #-----------------------------------------------------------
+  #-----------------------------------------------------------
+  #-----------------------------------------------------------
+
+ #--FILL THIS IN -- anything between the '<' and '>' symbols.
+ #-------------------------------------------------------------
+      if (<your test is successful>){
+
+         @variables = ("$test_being_performed", "$<your_value>",..."$<your_value>", "OK");
+      }
+      elsif (<your test is a WARNING>){
+
+         @variables = ("$test_being_performed", "$<your_value>",..."$<your_value>", "WARNING");
+      }
+      elsif (<your test is an ALERT>){
+
+         @variables = ("$test_being_performed", "$<your_value>",..."$<your_value>", "ALERT");
+
+         #--This writes the values 'ALERT' and other things to the XMATTER log file alert.
+         #--------------------------------------------------------------------------------
+         write_alert_header();
+
+         if ($alert_header_written_flag eq 'FALSE'){
+            write_header($header, $alert_log_handle);
+            $alert_header_written_flag = 'TRUE';
+         }
+
+         #--write to the alert log file
+         #-----------------------------
+         write_to_log_file_output($report, $alert_file_handle, \@variables);
+
+      }
+
+      #--write everything to the standard log file
+      #-------------------------------------------
+      write_to_log_file_output($report, $log_file_handle, \@variables);
+   }
+}
+1;
