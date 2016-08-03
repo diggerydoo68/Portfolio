@@ -1,0 +1,151 @@
+#!/usr/bin/perl
+
+#\/\/\/\/\/\/\/\/\/\/\/\/\/
+#--------Global Parameters
+#\/\/\/\/\/\/\/\/\/\/\/\/\/
+use CGI qq(:cgi);
+use CGI::Carp qw(fatalsToBrowser);
+use Monitoringdba_Subs;
+
+@q = {};
+$q = new CGI;
+
+require "environment_variables.pm";
+to_make_files_unique();
+
+sub create_list{
+
+
+   $sql_code = qq[select d.database_name                ||'!~!'||
+                         d.database_id                  ||'!~!'||
+                         d.tablespace_monitoring_flag   ||'!~!'||
+                         d.tablespace_monitoring_notes
+                    from databases d
+                   where d.is_accessible = 'Y'
+                     and d.is_a_dr = 'N'
+                    order by 1;];
+
+   foreach $line  (split /\n/, execute_sql($monitoringdba_usr,
+                                           $monitoringdba_pwd,
+                                           $monitoringdba_connection_string,
+                                           $monitoringdba_database,
+                                           $sql_code)){
+
+
+   ($database_name, $database_id, $monitoring_flag, $notes) = split /!~!/, $line;
+
+      #--get explicit variables
+      #------------------------
+
+      if ($monitoring_flag eq 'Y'){
+         $checked = "checked";
+      }
+      else{
+         $checked = "";
+      }
+
+      #--generate some output
+      #----------------------
+      #
+
+      print qq[   <tr>
+      <td align="left" width="30%"><input type="checkbox" name="$database_id.checked" $checked> $database_name </td>
+      <td align="center" width="70%"><input type="text" size="120" name="$database_id.notes" value="$notes"></td>
+   </tr>\n];
+   }
+
+}
+
+#================================================
+#         MAIN SECTION OF
+#================================================
+#
+#
+print $q->header;
+print qq[<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML>
+<TITLE>Servers Monitoring Toggle</TITLE>
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script src="side.js"></script>
+</head>
+<BODY>
+<!-- Sidebar navigation menu -->
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">X</a>
+  <a HREF="server_level_monitoring.html">Server Level Monitoring</a>
+  <hr>
+  <a href="database_level_monitoring.html">Database Level Monitoring</a>
+  <hr>
+  <a href="instance_level_monitoring.html">Instance Level Monitoring</a>
+  <hr>
+  <a href="database_tablespace_level_monitoring.html">Tablespace at Database Level Monitoring</a>
+  <hr>
+  <a href="choose_database_for_tablespace.html">Tablespace at Detail Level Monitoring</a>
+</div>
+
+<span style="font-size:30px;cursor:pointer" onclick="openNav()"><button class="button">Monitoring Controls<p>ON/OFF</p></button></span>
+
+<!-- Sidebar navigation menu -->
+
+<div id="main"><center><h1>Tablespace Monitoring Enable/Disable Control at DATABASE LEVEL</h1></center><p>
+<center><h3>(This will enable/disable [unless shut off at lower level]  tablespaces monitoring)</h3></center><p>
+<FORM ACTION="database_tablespace_level_monitoring_processing.pl" TARGET="right" method="post">
+<table style="width:90%" align="center">
+   <tr>
+      <th bgcolor="yellow" width="40%">Tablespace Monitoring DATABASE level (check is MONITORING-ON)</th>
+      <th bgcolor="yellow">Note as to why things may be DISABLED</th>
+   </tr>
+   ];
+
+   create_list();
+
+print qq[
+   <tr>
+      <td colspan="2" align="center"><input type="submit" value="Submit"></td>
+   </tr>
+</FORM></div>
+</BODY>
+</HTML>];
+
+
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML>
+<TITLE>Servers Monitoring Toggle</TITLE>
+<style>
+   table, th, td {
+   border: 1px solid black;
+}
+</style>
+<BODY>
+<center><h1>Tablespace Monitoring Enable/Disable Control at DATABASE LEVEL</h1></center><p>
+<center><h3>(This will enable/disable [unless shut off at lower level]  tablespaces monitoring)</h3></center><p>
+<FORM ACTION="database_tablespace_level_monitoring_processing.pl" TARGET="right" method="post">
+<table style="width:90%" align="center">
+   <tr>
+      <th bgcolor="yellow" width="40%">Tablespace Monitoring DATABASE level (check is MONITORING-ON)</th>
+      <th bgcolor="yellow">Note as to why things may be DISABLED</th>
+   </tr>
+];
+
+   create_list();
+
+print qq[
+   <tr>
+      <td colspan="2" align="center"><input type="submit" value="Submit"></td>
+   </tr>
+</FORM>
+</BODY>
+</HTML>];
+
+
+
+
+
+

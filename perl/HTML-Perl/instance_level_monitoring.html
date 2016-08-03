@@ -1,0 +1,154 @@
+#!/usr/bin/perl
+
+#\/\/\/\/\/\/\/\/\/\/\/\/\/
+#--------Global Parameters
+#\/\/\/\/\/\/\/\/\/\/\/\/\/
+use CGI qq(:cgi);
+use CGI::Carp qw(fatalsToBrowser);
+use Monitoringdba_Subs;
+
+@q = {};
+$q = new CGI;
+
+require "environment_variables.pm";
+to_make_files_unique();
+
+
+sub create_list{
+
+
+   $sql_code = qq[select d.database_name              ||'!~!'||
+                         i.instance_name              ||'!~!'||
+                         i.instance_id                ||'!~!'||
+                         i.instance_monitoring_flag   ||'!~!'||
+                         i.instance_monitoring_notes
+                    from databases d join instances i on (d.database_id = i.database_id)
+                   order by 1;];
+
+
+   foreach $line  (split /\n/, execute_sql($monitoringdba_usr,
+                                           $monitoringdba_pwd,
+                                           $monitoringdba_connection_string,
+                                           $monitoringdba_database,
+                                           $sql_code)){
+
+      ($database_name, $instance_name, $instance_id, $monitoring_flag, $notes) = split /!~!/, $line;
+
+
+      #--get explicit variables
+      #------------------------
+
+
+      if ($monitoring_flag eq 'Y'){
+         $checked = "checked";
+      }
+      else{
+         $checked = "";
+      }
+
+
+      #--generate some output
+      #----------------------
+      #
+
+      print qq[   <tr>
+      <td align="left" width="20%"><input type="checkbox" name="$instance_id.checked" $checked> $instance_name</td>
+      <td align="left" width="7%">$database_name</td>
+      <td align="center" width="70%"><input type="text" size="120" name="$instance_id.notes" value="$notes"></td>
+   </tr>\n];
+   }
+
+}
+
+
+#================================================
+#         MAIN SECTION OF
+#================================================
+#
+#
+print $q->header;
+print qq[<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML>
+<head>
+<TITLE>Servers Monitoring Toggle</TITLE>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script src="side.js"></script>
+</head>
+<BODY>
+
+<!-- Sidebar navigation menu -->
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">X</a>
+  <a HREF="server_level_monitoring.pl">Server Level Monitoring</a>
+  <hr>
+  <a href="database_level_monitoring.pl">Database Level Monitoring</a>
+  <hr>
+  <a href="instance_level_monitoring.pl">Instance Level Monitoring</a>
+  <hr>
+  <a href="database_tablespace_level_monitoring.pl">Tablespace at Database Level Monitoring</a>
+  <hr>
+  <a href="choose_database_for_tablespace.pl">Tablespace at Detail Level Monitoring</a>
+</div>
+
+<span style="font-size:30px;cursor:pointer" onclick="openNav()"><button class="button">Monitoring Controls<p>ON/OFF</p></button></span>
+
+<!-- Sidebar navigation menu -->
+
+<center><h1>Instance Monitoring Enable/Disable Control</h1></center><p>
+<center><h3>(This will enable/disable [unless shut off at lower level]  everything that touches these databases instances)</h3></center><p>
+<FORM ACTION="instance_level_monitoring_processing.pl" TARGET="right" method="post">
+<table style="width:90%" align="center">
+   <tr>
+      <th bgcolor="yellow" style="width:20%">Instance Monitoring (check is MONITORING-ON)</th>
+      <th bgcolor="yellow" style="width:7%">Database Name</th>
+      <th bgcolor="yellow">Note as to why things may be DISABLED</th>
+   </tr>
+   ];
+
+   create_list();
+
+print qq[
+   <tr>
+      <td colspan="3" align="center"><input type="submit" value="Submit"></td>
+   </tr>
+</FORM>
+</BODY>
+</HTML>];
+
+
+<!-- <!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML>
+<TITLE>Servers Monitoring Toggle</TITLE>
+<style>
+   table, th, td {
+   border: 1px solid black;
+}
+</style>
+<BODY>
+<center><h1>Instance Monitoring Enable/Disable Control</h1></center><p>
+<center><h3>(This will enable/disable [unless shut off at lower level]  everything that touches these databases instances)</h3></center><p>
+<FORM ACTION="instance_level_monitoring_processing.pl" TARGET="right" method="post">
+<table style="width:90%" align="center">
+   <tr>
+      <th bgcolor="yellow" style="width:20%">Instance Monitoring (check is MONITORING-ON)</th>
+      <th bgcolor="yellow" style="width:7%">Database Name</th>
+      <th bgcolor="yellow">Note as to why things may be DISABLED</th>
+   </tr>
+];
+
+   create_list();
+
+print qq[
+   <tr>
+      <td colspan="3" align="center"><input type="submit" value="Submit"></td>
+   </tr>
+</FORM>
+</BODY>
+</HTML>];
+ -->
+
+
+
+
+
+
