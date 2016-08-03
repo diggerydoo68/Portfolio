@@ -1,4 +1,7 @@
 #C:\Users\A591043\AppData\Local\Programs\Python\Python35\python.exe
+# This file was copied from a tutorial with O'reaily books tutorial
+# and has completly been used for practice and experimentation
+# code was written by Jessica McKellar
 import scrabble
 
 longest = ""
