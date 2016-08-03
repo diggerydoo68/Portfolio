@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#! C:\Users\A591043\AppData\Local\Programs\Python\Python35
 
 sql_command = """
 CREATE TABLE employee ( 
